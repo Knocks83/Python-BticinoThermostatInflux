@@ -9,7 +9,7 @@ from os.path import dirname, realpath
 
 load_dotenv(dotenv_path=dirname(realpath(__file__))+'/config.env')
 
-if getenv('CalculateAbsolutePath') == True:
+if getenv('CalculateAbsolutePath') == 'true':
     refreshTokenPath = dirname(realpath(__file__))+'/'+getenv('RefreshFileName')
 else:
     refreshTokenPath = getenv('RefreshFileName')
