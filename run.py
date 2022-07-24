@@ -1,3 +1,4 @@
+from time import sleep
 import bticino
 from influxdb_client import InfluxDBClient, Point
 from datetime import datetime
@@ -37,3 +38,5 @@ while True:
 
     influxWriteAPI.write(bucket=getenv('InfluxBucket'), org=getenv('InfluxOrg'), record=point)
     influxWriteAPI.flush()
+
+    sleep(getenv('RequestDelay'))
