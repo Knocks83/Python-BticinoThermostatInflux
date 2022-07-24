@@ -16,7 +16,7 @@ else:
 
 # Generate the objects
 bticinoObj = bticino.Bticino(getenv('ClientID'), getenv('ClientSecret'), getenv('Redirect'), getenv('SubscriptionKey'), getenv('PlantID'), getenv('ModuleID'), getenv('AuthEndpoint'), getenv('APIEndpoint'), refreshTokenPath)
-client = InfluxDBClient(host='localhost', port=8086, database='measurements')
+client = InfluxDBClient(host=getenv('InfluxHost'), port=getenv('InfluxPort'), database=getenv('InfluxDatabase'))
 
 while True:
     bticinoObj.login()
