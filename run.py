@@ -1,7 +1,7 @@
 from time import sleep
 import bticino
 from influxdb import InfluxDBClient
-from datetime import datetime
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 from os import getenv
@@ -33,7 +33,7 @@ while True:
             'humidity': float(measures['humidity']),
             'status': measures['status']
         },
-        'time': datetime.now().isoformat()
+        'time': datetime.now(timezone.utc).isoformat()
     }]
     client.write_points(point)
 
