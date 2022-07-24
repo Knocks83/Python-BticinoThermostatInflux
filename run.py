@@ -37,4 +37,4 @@ while True:
     }]
     client.write_points(point)
 
-    sleep(getenv('RequestDelay'))
+    sleep(int(getenv('RequestDelay')))
