@@ -1,6 +1,6 @@
 from time import sleep
 import bticino
-from influxdb_client import InfluxDBClient, Point
+from influxdb import InfluxDBClient
 from datetime import datetime
 
 from dotenv import load_dotenv
@@ -16,27 +16,25 @@ else:
 
 # Generate the objects
 bticinoObj = bticino.Bticino(getenv('ClientID'), getenv('ClientSecret'), getenv('Redirect'), getenv('SubscriptionKey'), getenv('PlantID'), getenv('ModuleID'), getenv('AuthEndpoint'), getenv('APIEndpoint'), refreshTokenPath)
-
-influxClient = InfluxDBClient(url=getenv('InfluxHost'), token=getenv('InfluxToken'), org=getenv('InfluxOrg'))
-influxWriteAPI = influxClient.write_api()
-
-
+client = InfluxDBClient(host='localhost', port=8086, database='measurements')
 
 while True:
     bticinoObj.login()
     measures = bticinoObj.measures()
 
-    point = ( 
-        Point(getenv('InfluxMeasurementName'))
-        .tag('sensorType', 'BticinoThermostat')
-        .tag('sensorID', getenv('ModuleID'))
-        .field('temperature', measures['temperature'])
-        .field('humidity', measures['humidity'])
-        .field('status', measures['status'])
-        .time(datetime.now().isoformat())
-    )
-
-    influxWriteAPI.write(bucket=getenv('InfluxBucket'), org=getenv('InfluxOrg'), record=point)
-    influxWriteAPI.flush()
+    point = [{
+        'measurement': getenv('InfluxMeasurementName'),
+        'tags': {
+            'sensorType': 'BticinoThermostat',
+            'sensorID': getenv('ModuleID')
+        },
+        'fields': {
+            'temperature': measures['temperature'],
+            'humidity': measures['humidity'],
+            'status': measures['status']
+        },
+        'time': datetime.now().isoformat()
+    }]
+    client.write_points(point)
 
     sleep(getenv('RequestDelay'))
