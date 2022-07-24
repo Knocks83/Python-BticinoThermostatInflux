@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from os import getenv
 from os.path import dirname, realpath
 
-load_dotenv(dotenv_path=dirname(realpath(__file__))+'/config.env.bak')
+load_dotenv(dotenv_path=dirname(realpath(__file__))+'/config.env')
 
 if getenv('CalculateAbsolutePath') == True:
     refreshTokenPath = dirname(realpath(__file__))+'/'+getenv('RefreshFileName')
