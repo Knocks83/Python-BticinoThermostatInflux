@@ -29,8 +29,8 @@ while True:
             'sensorID': getenv('ModuleID')
         },
         'fields': {
-            'temperature': measures['temperature'],
-            'humidity': measures['humidity'],
+            'temperature': float(measures['temperature']),
+            'humidity': float(measures['humidity']),
             'status': measures['status']
         },
         'time': datetime.now().isoformat()
