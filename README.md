@@ -1,6 +1,6 @@
 # Python-BticinoThermostatInflux
 
-A remake of (this Golang version)[https://github.com/Knocks83/Go-BticinoThermostatInflux], just because.
+A remake of [this Golang version](https://github.com/Knocks83/Go-BticinoThermostatInflux), just because.
 
 ---
 ## Requirements
