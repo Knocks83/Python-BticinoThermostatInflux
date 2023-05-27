@@ -7,7 +7,10 @@ from dotenv import load_dotenv
 from os import getenv
 from os.path import dirname, realpath
 
+import logging
+
 load_dotenv(dotenv_path=dirname(realpath(__file__))+'/config.env')
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
 if getenv('CalculateAbsolutePath') == 'true':
     refreshTokenPath = dirname(realpath(__file__))+'/'+getenv('RefreshFileName')
@@ -19,8 +22,11 @@ bticinoObj = bticino.Bticino(getenv('ClientID'), getenv('ClientSecret'), getenv(
 client = InfluxDBClient(host=getenv('InfluxHost'), port=getenv('InfluxPort'), database=getenv('InfluxDatabase'))
 
 while True:
+    logging.debug("Starting loop")
     bticinoObj.login()
+    logging.debug('Logged in!')
     measures = bticinoObj.measures()
+    logging.debug("Measurements: " + str(measures))
 
     point = [{
         'measurement': getenv('InfluxMeasurementName'),
@@ -35,6 +41,8 @@ while True:
         },
         'time': datetime.now(timezone.utc).isoformat()
     }]
+    logging.debug("Point: " + str(point))
     client.write_points(point)
 
+    logging.debug("Finished loop, starting sleep")
     sleep(int(getenv('RequestDelay')))

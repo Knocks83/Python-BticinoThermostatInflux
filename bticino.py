@@ -2,6 +2,8 @@ from requests import get, post
 from json import loads
 from os.path import exists
 
+import logging
+
 
 class Bticino:
     def __init__(self, ClientID: str, ClientSecret: str, Redirect: str, SubscriptionKey: str, PlantID: str, ModuleID: str, AuthEndpoint: str, APIEndpoint: str, RefreshTokenPath: str):
@@ -78,14 +80,15 @@ class Bticino:
         parsed = loads(res.content)
         # If there's an error, authorize again.
         if 'error' in parsed:
+            logging.debug('Error refreshing token, logging in again')
             # Clear variables
             self.__RefreshToken = None
             self.__AccessToken = None
 
             self.login()
-
-        self.__AccessToken = parsed['access_token']
-        self.__SetRefreshToken(parsed['refresh_token'])
+        else:
+            self.__AccessToken = parsed['access_token']
+            self.__SetRefreshToken(parsed['refresh_token'])
 
 
     def login(self):
@@ -102,7 +105,9 @@ class Bticino:
 
         res = get(headers=headers, url=url)
         parsed = loads(res.content)
+        logging.debug(str(parsed))
         
+        # If "code" is present in the returned JSON, that means there's an error code, so try logging in again and getting the measurements again
         if 'code' in parsed:
             self.login()
             self.measures()
