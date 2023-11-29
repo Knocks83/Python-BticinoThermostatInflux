@@ -10,7 +10,7 @@ from os.path import dirname, realpath
 import logging
 
 load_dotenv(dotenv_path=dirname(realpath(__file__))+'/config.env')
-logging.basicConfig(encoding='utf-8', level=logging.INFO)
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 if getenv('CalculateAbsolutePath') == 'true':
     refreshTokenPath = dirname(realpath(__file__))+'/'+getenv('RefreshFileName')
@@ -23,26 +23,31 @@ client = InfluxDBClient(host=getenv('InfluxHost'), port=getenv('InfluxPort'), da
 
 while True:
     logging.debug("Starting loop")
-    bticinoObj.login()
-    logging.debug('Logged in!')
-    measures = bticinoObj.measures()
-    logging.debug("Measurements: " + str(measures))
+    try:
+        bticinoObj.login()
+        logging.debug('Logged in!')
+        measures = bticinoObj.measures()
+        logging.debug("Measurements: " + str(measures))
 
-    point = [{
-        'measurement': getenv('InfluxMeasurementName'),
-        'tags': {
-            'sensorType': 'BticinoThermostat',
-            'sensorID': getenv('ModuleID')
-        },
-        'fields': {
-            'temperature': float(measures['temperature']),
-            'humidity': float(measures['humidity']),
-            'status': measures['status']
-        },
-        'time': datetime.now(timezone.utc).isoformat()
-    }]
-    logging.debug("Point: " + str(point))
-    client.write_points(point)
-
-    logging.debug("Finished loop, starting sleep")
-    sleep(int(getenv('RequestDelay')))
+        point = [{
+            'measurement': getenv('InfluxMeasurementName'),
+            'tags': {
+                'sensorType': 'BticinoThermostat',
+                'sensorID': getenv('ModuleID')
+            },
+            'fields': {
+                'temperature': float(measures['temperature']),
+                'humidity': float(measures['humidity']),
+                'status': measures['status']
+            },
+            'time': datetime.now(timezone.utc).isoformat()
+        }]
+        logging.debug("Point: " + str(point))
+        client.write_points(point)
+    except KeyError as e:
+        logging.error('KeyError while executing loop! ' + str(e))
+    except Exception as e:
+        logging.error('Generic exception while executing loop! ' + str(e))
+    finally:
+        logging.debug("Finished loop, starting sleep")
+        sleep(int(getenv('RequestDelay')))
