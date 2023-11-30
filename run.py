@@ -1,6 +1,6 @@
 from time import sleep
 import bticino
-from influxdb import InfluxDBClient
+import influxdb_client
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
@@ -10,7 +10,7 @@ from os.path import dirname, realpath
 import logging
 
 load_dotenv(dotenv_path=dirname(realpath(__file__))+'/config.env')
-logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
 if getenv('CalculateAbsolutePath') == 'true':
     refreshTokenPath = dirname(realpath(__file__))+'/'+getenv('RefreshFileName')
@@ -19,7 +19,8 @@ else:
 
 # Generate the objects
 bticinoObj = bticino.Bticino(getenv('ClientID'), getenv('ClientSecret'), getenv('Redirect'), getenv('SubscriptionKey'), getenv('PlantID'), getenv('ModuleID'), getenv('AuthEndpoint'), getenv('APIEndpoint'), refreshTokenPath)
-client = InfluxDBClient(host=getenv('InfluxHost'), port=getenv('InfluxPort'), database=getenv('InfluxDatabase'))
+influx_client = influxdb_client.InfluxDBClient(url=getenv('InfluxURL'), token=getenv('InfluxToken'), org=getenv('InfluxOrg'))
+write_api = influx_client.write_api(write_options=influxdb_client.client.write_api.SYNCHRONOUS)
 
 while True:
     logging.debug("Starting loop")
@@ -43,7 +44,7 @@ while True:
             'time': datetime.now(timezone.utc).isoformat()
         }]
         logging.debug("Point: " + str(point))
-        client.write_points(point)
+        write_api.write(bucket=getenv('InfluxBucket'), org=getenv('InfluxOrg'), record=point)
     except KeyError as e:
         logging.error('KeyError while executing loop! ' + str(e))
     except Exception as e:
