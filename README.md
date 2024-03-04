@@ -37,8 +37,5 @@ A remake of [this Golang version](https://github.com/Knocks83/Go-BticinoThermost
     - `python3 run.py`
 ___
 
-That's all Folks!
-For help just [ask me on Telegram](https://t.me/Knocks)!
-
 This Source Code Form is subject to the terms of the Apache-v2.0 License. If a copy of the Apache-V2.0 License was not distributed with this
 file, You can obtain one at <https://www.apache.org/licenses/LICENSE-2.0>.
